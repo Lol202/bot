@@ -32,7 +32,7 @@ for event in longpoll.listen():     #начинаем слушать лонгп�
         elif event.obj.text.lower() == 'пока':
             send_message('пока')
             print(event.obj.text)
-        elif event.obj.text.lower() == 'кик %user%':
-            kick %user%
+        elif event.obj.text.lower() == 'кик':
+            messages.removeChatUser.replace("%user%", message.FromID)
 # vk.method('сам метод',{параметры метода})
 
