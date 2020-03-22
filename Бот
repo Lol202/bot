@@ -26,5 +26,13 @@ for event in longpoll.listen():     #начинаем слушать лонгп�
         if event.obj.text.lower() == 'команды':
             send_message('Я не имею команд')
             print(event.obj.text)
+        elif event.obj.text.lower() == 'привет':
+            send_message('привет')
+            print(event.obj.text)
+        elif event.obj.text.lower() == 'пока':
+            send_message('пока')
+            print(event.obj.text)
+        elif event.obj.text.lower() == 'кик %user%':
+            kick %user%
 # vk.method('сам метод',{параметры метода})
 
