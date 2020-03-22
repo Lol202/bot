@@ -1,49 +1,30 @@
-import time
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
 import vk_api
-import random
-from vk_api.longpoll import VkLongPoll, VkEventType
-#import u_photo
- 
- 
-def write_msg(rand_int, user_id, message):
-    vk.method('messages.send', {'user_id': user_id, 'message': message, 'random_id': rand_int})
- 
- 
-# API-ключ
-token = "3709764b230f73dbf6a6fca9c41e726af8c0e28eff5ea171f2e25d6b5d3761711e9cf46b77cbf3d7c47ba"
- 
-# Авторизуемся как сообщество
-#vk = vk_api.VkApi(token=token)
-vk = vk_api.VkApi(token = '3709764b230f73dbf6a6fca9c41e726af8c0e28eff5ea171f2e25d6b5d3761711e9cf46b77cbf3d7c47ba')
- 
-longpoll = VkLongPoll(vk)
-print("Бот запущен")
- 
-# Основной цикл
-while True:
-    time.sleep(5)
-    for event in longpoll.listen():
- 
-        # Если пришло новое сообщение
-        if event.type == VkEventType.MESSAGE_NEW:
- 
-            if event.to_me:
- 
-                request = event.text
-                randint = random.randint(100000000,900000000)
-                request = request.lower()
-                chat_id = vk.method('messages.getConversations')
-                chat_id = chat_id['items']
-                print(chat_id)
- 
-                # Каменная логика ответа
-                for check in request:
-                   #id = vk.method('messages.getConversations')
-                   #id = id['items'][0]['last_message']['from_id']
-                   #print(id)'
-                    if request == "привет":
-                        write_msg(randint, event.user_id, "Хай")
-                    elif request == "пока":
-                        write_msg(randint, event.user_id, "Пока :(")
-                    elif request == "Команды":
-                        write_msg(randint, event.user_id, "Команды")
+from vk_api.bot_longpoll import VkBotLongPoll
+from vk_api.utils import get_random_id
+
+vk = vk_api.VkApi(token='3709764b230f73dbf6a6fca9c41e726af8c0e28eff5ea171f2e25d6b5d3761711e9cf46b77cbf3d7c47ba')  #токен паблика
+
+class MyVkLongPoll(VkBotLongPoll):                      # создаю класс чтобы он не терял соединение с сервером вк когда тот  перезагружается (перезагружается раз в день где-то глубоко ночью)
+        def listen(self):
+            while True:
+                try:
+                    for event in self.check():
+                        yield event
+                except Exception as e:
+                        print(e)            #будет писать в консоль что таймаут произошел, при желании просто впишите сюда pass
+
+bot_id = '193179464'      # сюда id паблика
+longpoll = MyVkLongPoll(vk, bot_id)
+
+def send_message(msg):
+    vk.method('messages.send',{'random_id':get_random_id(),'peer_id':event.obj.peer_id,'message':msg})
+
+for event in longpoll.listen():     #начинаем слушать лонгпулл
+    if event.obj:
+        if event.obj.text.lower() == 'команды':
+            send_message('Я не имею команд')
+            print(event.obj.text)
+# vk.method('сам метод',{параметры метода})
+
